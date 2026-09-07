@@ -1,4 +1,4 @@
-# HVAC Field Service — Laravel API
+# Engineering Home — Laravel API
 
 Laravel 13 API (Sanctum SPA cookie auth). Default local database is SQLite.
 

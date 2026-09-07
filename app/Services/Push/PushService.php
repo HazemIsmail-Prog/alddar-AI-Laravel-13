@@ -58,7 +58,7 @@ class PushService
             $this->sendTo(
                 $technician,
                 'New job #'.$order->id,
-                (string) ($order->client?->name ?: 'CoolAir'),
+                (string) ($order->client?->name ?: 'Engineering Home'),
                 $this->techOrderUrl($order),
             );
         });
