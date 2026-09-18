@@ -106,7 +106,7 @@ class InvoiceController extends Controller
     {
         $invoice->load('order');
         $user = $request->user();
-        if (! $user->hasPermission('invoices.update')) {
+        if (! $user->hasPermission('invoices.update') && ! $user->hasPermission('invoices.confirm')) {
             abort(403, 'You cannot edit this invoice.');
         }
         $this->assertInvoiceAccess($user, $invoice, $orders, 'You cannot edit this invoice.');

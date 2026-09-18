@@ -5,14 +5,14 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\InboxController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InboxController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PushController;
 use App\Http\Controllers\OrderStatusController;
+use App\Http\Controllers\PushController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StockFlowController;
 use App\Http\Controllers\UserController;
@@ -125,7 +125,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
     Route::get('/invoices', [InvoiceController::class, 'index'])->middleware('permission:invoices.view');
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])->middleware('permission:invoices.view');
-    Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->middleware('permission:invoices.update');
+    Route::put('/invoices/{invoice}', [InvoiceController::class, 'update'])->middleware('permission:invoices.update,invoices.confirm');
     Route::post('/invoices/{invoice}/confirm', [InvoiceController::class, 'confirm'])->middleware('permission:invoices.confirm');
     Route::delete('/invoices/{invoice}', [InvoiceController::class, 'destroy'])->middleware('permission:invoices.delete');
     Route::post('/payments', [InvoiceController::class, 'pay'])->middleware('permission:payments.collect');
