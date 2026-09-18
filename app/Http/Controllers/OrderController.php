@@ -13,6 +13,7 @@ use App\Services\Payments\PaymentService;
 use App\Support\RequestFilters;
 use App\Support\StaffRealtime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
@@ -193,7 +194,7 @@ class OrderController extends Controller
         }
 
         $orders = ServiceOrder::query()
-            ->with(['client', 'phone', 'location', 'technician', 'invoices', 'invoice', 'department', 'statusHistory'])
+            ->with(['client', 'phone', 'location', 'technician', 'invoices', 'invoice', 'department', 'statusHistory', 'contract:id,type'])
             ->where('department_id', $departmentId)
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('sort_order')
@@ -583,7 +584,7 @@ class OrderController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, Department>  $departments
+     * @param  Collection<int, Department>  $departments
      * @return array<int, int>
      */
     private function currentJobIdsByDepartment($departments, User $user, OrderService $orders): array

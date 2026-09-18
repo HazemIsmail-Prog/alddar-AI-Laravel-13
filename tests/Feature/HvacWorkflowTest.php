@@ -24,8 +24,8 @@ use App\Services\Inventory\InventoryService;
 use App\Services\Inventory\TransferService;
 use App\Services\Invoices\InvoiceService;
 use App\Services\Orders\OrderService;
-use App\Services\Push\PushService;
 use App\Services\Payments\PaymentService;
+use App\Services\Push\PushService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -481,6 +481,15 @@ class HvacWorkflowTest extends TestCase
         $this->assertTrue(collect($board['technicians'])->every(
             fn ($col) => array_key_exists('completed_today', $col) && array_key_exists('cancelled_today', $col)
         ));
+
+        $withContract = collect($board['technicians'])
+            ->flatMap(fn ($col) => $col['orders'])
+            ->concat($board['unassigned'])
+            ->concat($board['planned'])
+            ->concat($board['held'])
+            ->first(fn ($order) => ! empty($order['contract']));
+        $this->assertNotNull($withContract);
+        $this->assertSame('annual', $withContract['contract']['type']);
     }
 
     public function test_dispatch_board_counts_today_completed_and_cancelled(): void
@@ -2813,6 +2822,38 @@ class HvacWorkflowTest extends TestCase
         $this->actingAs($callCenter)
             ->putJson('/api/invoices/'.$invoice->id, ['discount' => 0])
             ->assertForbidden();
+    }
+
+    public function test_confirmer_can_change_invoice_line_quantity(): void
+    {
+        $tech = User::query()->where('email', 'tech@example.test')->with('warehouse')->first();
+        $dispatcher = User::query()->where('email', 'dispatcher@example.test')->first();
+        $order = ServiceOrder::query()->whereNull('contract_id')->where('status', 'pending')->first();
+        $orders = app(OrderService::class);
+        $orders->assign($order, $tech, $dispatcher, 0);
+        $order = $orders->currentFor($tech);
+        $orders->accept($order, $tech);
+        $orders->reached($order->fresh(), $tech);
+
+        $service = Item::query()->where('sku', 'SVC-VISIT')->first();
+        $invoice = app(InvoiceService::class)->createDraft($order->fresh(), $tech, [
+            ['item_id' => $service->id, 'quantity' => 1],
+        ]);
+
+        $confirmer = User::factory()->create(['created_by' => $tech->id]);
+        $confirmer->extraPermissions()->attach(
+            Permission::query()->where('slug', 'invoices.confirm')->firstOrFail()
+        );
+
+        $this->assertFalse($confirmer->hasPermission('invoices.update'));
+
+        $this->actingAs($confirmer)
+            ->putJson('/api/invoices/'.$invoice->id, [
+                'items' => [['item_id' => $service->id, 'quantity' => 3]],
+            ])
+            ->assertOk();
+
+        $this->assertSame('3.00', (string) $invoice->fresh()->items()->first()->quantity);
     }
 
     public function test_contracts_index_supports_filters(): void
