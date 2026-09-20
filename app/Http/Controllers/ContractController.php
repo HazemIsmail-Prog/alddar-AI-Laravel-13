@@ -82,8 +82,11 @@ class ContractController extends Controller
     {
         $number = trim($request->string('number')->toString());
         if ($number !== '') {
-            $id = (int) ltrim($number, '#');
-            $q->where('id', $id > 0 ? $id : 0);
+            $q->where(function ($query) use ($number) {
+                $id = (int) ltrim($number, '#');
+                $query->where('id', $id)
+                    ->orWhere('reference_no', 'like', '%'.$number.'%');
+            });
         }
 
         $types = array_values(array_intersect(RequestFilters::listParam($request, 'type'), ['warranty', 'annual']));

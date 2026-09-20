@@ -197,7 +197,8 @@ class SearchController extends Controller
                 ->with(['client', 'location'])
                 ->where(function ($query) use ($like, $digits) {
                     $query->whereHas('client', fn ($c) => $c->where('name', 'like', $like))
-                        ->orWhere('type', 'like', $like);
+                        ->orWhere('type', 'like', $like)
+                        ->orWhere('reference_no', 'like', $like);
                     if ($digits) {
                         $query->orWhere('id', (int) $digits);
                     }
@@ -209,7 +210,7 @@ class SearchController extends Controller
             $items = $contracts->map(fn (Contract $contract) => [
                 'id' => $contract->id,
                 'title' => $contract->client?->name.' · '.$contract->type,
-                'subtitle' => collect([$contract->location?->label, $contract->status])->filter()->implode(' · '),
+                'subtitle' => collect([$contract->reference_no, $contract->location?->label, $contract->status])->filter()->implode(' · '),
                 'href' => '/contracts/'.$contract->id,
                 'actions' => [
                     ['label' => 'Open', 'to' => '/contracts/'.$contract->id],
