@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             ChartOfAccountsSeeder::class,
             DemoDataSeeder::class,
+            ItemsSeeder::class,
+            ClientsContractSeeder::class,
         ]);
 
         Auth::logout();

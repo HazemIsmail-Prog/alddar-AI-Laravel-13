@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'client_id', 'location_id', 'department_id', 'type', 'includes_spare_parts',
+    'client_id', 'location_id', 'department_id', 'type', 'reference_no', 'includes_spare_parts',
     'includes_compressor_warranty', 'compressor_warranty_start', 'compressor_warranty_end',
     'start_date', 'end_date', 'total_amount', 'payment_count', 'planned_visits', 'status', 'created_by',
 ])]
 class Contract extends Model
 {
     use HasAttachments, HasComments, HasCreator;
+
     protected function casts(): array
     {
         return [
