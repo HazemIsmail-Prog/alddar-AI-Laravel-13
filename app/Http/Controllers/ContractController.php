@@ -56,6 +56,7 @@ class ContractController extends Controller
             'department_id' => ['required', Department::serviceIdRule()],
             'type' => ['required', 'in:warranty,annual'],
             'status' => ['nullable', 'in:active,cancelled,expired'],
+            'reference_no' => ['nullable', 'string', 'max:50'],
             'includes_spare_parts' => ['boolean'],
             'includes_compressor_warranty' => ['boolean'],
             'compressor_warranty_start' => ['nullable', 'date'],

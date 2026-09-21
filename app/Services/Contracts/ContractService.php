@@ -229,6 +229,7 @@ class ContractService
             'location_id' => $data['location_id'],
             'department_id' => $data['department_id'],
             'type' => $data['type'],
+            'reference_no' => $data['reference_no'] ?? null,
             'includes_spare_parts' => $data['includes_spare_parts'],
             'includes_compressor_warranty' => (bool) $data['includes_compressor_warranty'],
             'compressor_warranty_start' => $data['compressor_warranty_start'] ?? null,
