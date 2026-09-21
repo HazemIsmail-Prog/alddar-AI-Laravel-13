@@ -91,7 +91,7 @@ class MasterDataController extends Controller
         $perPage = min(max($request->integer('per_page', 20), 1), 50);
 
         $q = Client::query()
-            ->with($compact ? ['phones', 'locations', 'creator'] : ['phones', 'locations.machines', 'creator'])
+            ->with($compact ? ['phones', 'locations', 'creator'] : ['phones', 'locations.machines', 'creator', 'contracts:id,client_id,status,end_date'])
             ->latest('id');
 
         if ($search !== '') {
